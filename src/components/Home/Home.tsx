@@ -94,8 +94,9 @@ export const Home = (props: Props) => {
                          </li></>
                     }  
                    
-            </LogoNavigation>
-        </NavBarContainer><Main>
+                </LogoNavigation>
+        </NavBarContainer>
+                <Main>
                 <MainText>
                     <h1>{props.title}</h1>
                     <p> Welcome to our Drone page!!!</p>

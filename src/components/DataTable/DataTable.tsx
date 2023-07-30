@@ -1,6 +1,7 @@
 // External Imports
-import React, { useState } from 'react'; 
+import React, { useEffect, useState } from 'react'; 
 import Box from '@mui/material/Box';
+import TextField from '@mui/material/TextField';
 import { DataGrid, GridColDef, GridRowSelectionModel } from '@mui/x-data-grid'; 
 import {
     Button,
@@ -77,6 +78,8 @@ export const DataTable = () => {
     const { droneData, getData } = useGetData()
     const [ open, setOpen ] = useState(false)
     const [ gridData, setData ] = useState<GridRowSelectionModel>([])
+    const [ searchTerm, setSearchTerm ] = useState("") // new state for search term
+    const [ searchResults, setSearchResults ] = useState([]) // new state for search results
 
     const handleOpen = () => {
         setOpen(true)
@@ -91,45 +94,64 @@ export const DataTable = () => {
         getData()
     }
 
+    const handleSearch = () => {
+      const results = droneData.filter(drone =>
+          drone.name.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+      setSearchResults(results);
+  };
+
+  useEffect(() => {
+      setSearchResults(droneData);
+  }, [droneData]);
+
 
     const myAuth = localStorage.getItem('myAuth')
 
     if (myAuth === 'true'){
-    return (
-        <Box sx={{ height: 400, width: '100%'}}>
-            <DataGrid
-                rows={droneData}
-                columns={columns}
-                initialState={{
-                    pagination: {
-                        paginationModel: {
-                            pageSize: 5
-                        }
-                    }
-                }}
-                pageSizeOptions={[5]}
-                checkboxSelection
-                onRowSelectionModelChange={(newSelectionModel) => setData(newSelectionModel)}
-            />
-            <Button onClick={handleOpen}>Update</Button>
-            <Button variant='contained' color='warning' onClick={deleteData}>Delete</Button>
-            {/* Dialog Popup for Updating a Drone */}
-            <Dialog open={open} onClose={handleClose} aria-labelledby='form-dialog-title'>
-                <DialogTitle id='form-dialog-title'>Update A Drone</DialogTitle>
-                <DialogContent>
-                    <DialogContentText>Drone id: {gridData[0]}</DialogContentText>
-                    <DroneForm id={`${gridData[0]}`} />
-                </DialogContent>
-                <DialogActions>
-                    <Button onClick={handleClose} color='error'>Cancel</Button>
-                </DialogActions>
-            </Dialog>
-        </Box>
-        )} else {
-            return (
-                <Box>
-                    <Typography variant='h4'>Please Sign In to View your Drones!</Typography>
-                </Box>
-            )
-        }
+      return (
+          <Box sx={{ height: 400, width: '100%'}}>
+              <TextField 
+                  id="search-field" 
+                  label="Search Drones" 
+                  variant="outlined" 
+                  value={searchTerm} 
+                  onChange={(e) => setSearchTerm(e.target.value)} 
+              />
+              <Button onClick={handleSearch}>Search</Button>
+              <DataGrid
+                  rows={searchResults} // use searchResults instead of droneData
+                  columns={columns}
+                  initialState={{
+                      pagination: {
+                          paginationModel: {
+                              pageSize: 5
+                          }
+                      }
+                  }}
+                  pageSizeOptions={[5]}
+                  checkboxSelection
+                  onRowSelectionModelChange={(newSelectionModel) => setData(newSelectionModel)}
+              />
+              <Button onClick={handleOpen}>Update</Button>
+              <Button variant='contained' color='warning' onClick={deleteData}>Delete</Button>
+              {/* Dialog Popup for Updating a Drone */}
+              <Dialog open={open} onClose={handleClose} aria-labelledby='form-dialog-title'>
+                  <DialogTitle id='form-dialog-title'>Update A Drone</DialogTitle>
+                  <DialogContent>
+                      <DialogContentText>Drone id: {gridData[0]}</DialogContentText>
+                      <DroneForm id={`${gridData[0]}`} />
+                  </DialogContent>
+                  <DialogActions>
+                      <Button onClick={handleClose} color='error'>Cancel</Button>
+                  </DialogActions>
+              </Dialog>
+          </Box>
+      )} else {
+          return (
+              <Box>
+                  <Typography variant='h4'>Please Sign In to View your Drones!</Typography>
+              </Box>
+          )
+      }
   }

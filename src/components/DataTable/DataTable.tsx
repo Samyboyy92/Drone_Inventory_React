@@ -16,6 +16,7 @@ import {
 import { serverCalls } from '../../api';
 import { useGetData } from '../../custom-hooks';
 import { DroneForm } from '../DroneForm';
+import { DroneState } from '../../redux/slices/rootSlice';
 
 
 const columns: GridColDef[] = [
@@ -79,7 +80,7 @@ export const DataTable = () => {
     const [ open, setOpen ] = useState(false)
     const [ gridData, setData ] = useState<GridRowSelectionModel>([])
     const [ searchTerm, setSearchTerm ] = useState("") // new state for search term
-    const [ searchResults, setSearchResults ] = useState([]) // new state for search results
+    const [ searchResults, setSearchResults ] = useState<DroneState[]>([])
 
     const handleOpen = () => {
         setOpen(true)
@@ -94,7 +95,7 @@ export const DataTable = () => {
         getData()
     }
 
-    const handleSearch = () => {
+    const handleSearch = () => {        
       const results = droneData.filter(drone =>
           drone.name.toLowerCase().includes(searchTerm.toLowerCase())
       );
